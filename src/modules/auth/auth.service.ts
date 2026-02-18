@@ -117,10 +117,7 @@ export class AuthService {
       role,
     };
 
-    return this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('jwt.secret'),
-      expiresIn: this.configService.get<string>('jwt.expiresIn'),
-    });
+    return this.jwtService.sign(payload);
   }
 
   /**

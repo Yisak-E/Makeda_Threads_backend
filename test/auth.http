@@ -1,0 +1,158 @@
+### Authentication API Tests
+### Base URL: http://localhost:3000/api/v1
+
+### Variables
+@baseUrl = http://localhost:3000/api/v1
+@token = 
+
+###############################################
+# 1. Register New User
+###############################################
+
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "name": "New Test User",
+  "password": "Password123"
+}
+
+###############################################
+# 2. Login - Admin
+###############################################
+
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@makedathreads.com",
+  "password": "Password123"
+}
+
+###############################################
+# 3. Login - Customer
+###############################################
+
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "abebe.bekele@example.com",
+  "password": "Password123"
+}
+
+###############################################
+# 4. Login - Brand Partner
+###############################################
+
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "partner@brandpartner.com",
+  "password": "Password123"
+}
+
+###############################################
+# 5. Get Current User Profile (Protected)
+# NOTE: Replace YOUR_TOKEN with actual token from login response
+###############################################
+
+GET {{baseUrl}}/auth/me
+Authorization: Bearer YOUR_TOKEN
+
+###############################################
+# 6. Test Invalid Credentials
+###############################################
+
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@makedathreads.com",
+  "password": "WrongPassword123"
+}
+
+###############################################
+# 7. Test Duplicate Registration
+###############################################
+
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin@makedathreads.com",
+  "name": "Duplicate User",
+  "password": "Password123"
+}
+
+###############################################
+# 8. Test Weak Password (Should Fail)
+###############################################
+
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "weakpass@example.com",
+  "name": "Weak Pass User",
+  "password": "weak"
+}
+
+###############################################
+# 9. Test Invalid Email (Should Fail)
+###############################################
+
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "invalid-email",
+  "name": "Invalid Email User",
+  "password": "Password123"
+}
+
+###############################################
+# 10. Protected Route - User Profile (Any authenticated user)
+###############################################
+
+GET {{baseUrl}}/users/profile
+Authorization: Bearer YOUR_TOKEN
+
+###############################################
+# 11. Admin Only Route (Requires admin role)
+###############################################
+
+GET {{baseUrl}}/users/admin/dashboard
+Authorization: Bearer YOUR_ADMIN_TOKEN
+
+###############################################
+# 12. Partner Dashboard (Admin or Brand Partner)
+###############################################
+
+GET {{baseUrl}}/users/partner/dashboard
+Authorization: Bearer YOUR_ADMIN_OR_PARTNER_TOKEN
+
+###############################################
+# Testing Scenarios
+###############################################
+
+# Scenario 1: Complete Registration Flow
+# 1. POST /auth/register → Get token
+# 2. GET /auth/me with token → Verify profile
+
+# Scenario 2: Complete Login Flow
+# 1. POST /auth/login → Get token
+# 2. GET /auth/me with token → Verify profile
+
+# Scenario 3: Role-Based Access
+# 1. Login as customer
+# 2. Try to access /users/admin/dashboard → Should fail (403)
+# 3. Login as admin
+# 4. Access /users/admin/dashboard → Should succeed
+
+# Scenario 4: Token Expiration
+# 1. Login and get token
+# 2. Wait for token to expire (7 days default)
+# 3. Try to access protected route → Should fail (401)

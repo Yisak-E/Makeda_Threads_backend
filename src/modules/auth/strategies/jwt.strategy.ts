@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { User, UserDocument } from '../schemas/users.schema';
+import { User, UserDocument } from '../../users/schemas/users.schema';
 
 export interface JwtPayload {
   sub: string; // user id
@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('jwt.secret'),
+      secretOrKey: configService.get<string>('jwt.secret') || 'default-secret',
     });
   }
 
