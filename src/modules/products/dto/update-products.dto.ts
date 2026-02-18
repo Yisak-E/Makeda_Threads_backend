@@ -6,28 +6,32 @@ import {
   Min,
   Max,
   MinLength,
-  IsUrl,
 } from 'class-validator';
 import { ProductCategory } from '../schemas/products.schema';
 
-export class CreateProductDto {
+export class UpdateProductDto {
   @IsString()
   @MinLength(2)
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @IsNumber()
   @Min(0)
-  price: number;
+  @IsOptional()
+  price?: number;
 
   @IsString()
-  image: string;
+  @IsOptional()
+  image?: string;
 
   @IsEnum(ProductCategory)
-  category: ProductCategory;
+  @IsOptional()
+  category?: ProductCategory;
 
   @IsNumber()
   @Min(0)
-  stockQuantity: number;
+  @IsOptional()
+  stockQuantity?: number;
 
   @IsNumber()
   @Min(0)

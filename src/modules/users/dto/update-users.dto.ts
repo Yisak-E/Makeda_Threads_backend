@@ -5,26 +5,15 @@ import {
   IsOptional,
   MinLength,
   MaxLength,
-  Matches,
 } from 'class-validator';
 import { UserRole } from '../schemas/users.schema';
 
-export class CreateUserDto {
-  @IsEmail()
-  email: string;
-
+export class UpdateUserDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
-  name: string;
-
-  @IsString()
-  @MinLength(8)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-    message:
-      'Password must contain at least one uppercase letter, one lowercase letter, and one number',
-  })
-  password: string;
+  @IsOptional()
+  name?: string;
 
   @IsEnum(UserRole)
   @IsOptional()
