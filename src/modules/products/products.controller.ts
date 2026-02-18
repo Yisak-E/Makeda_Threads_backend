@@ -10,6 +10,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-products.dto';
 import { UpdateProductDto } from './dto/update-products.dto';
@@ -19,11 +26,15 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../users/schemas/users.schema';
 
+@ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get product catalog' })
+  @ApiQuery({ name: 'category', required: false, type: String })
+  @ApiResponse({ status: 200, description: 'Products retrieved.' })
   async findAll(@Query('category') category?: string) {
     if (category && !this.isValidCategory(category)) {
       throw new BadRequestException('Invalid category');
@@ -33,6 +44,10 @@ export class ProductsController {
   }
 
   @Get('search')
+  @ApiOperation({ summary: 'Search products' })
+  @ApiQuery({ name: 'query', required: false, type: String })
+  @ApiQuery({ name: 'category', required: false, type: String })
+  @ApiResponse({ status: 200, description: 'Products retrieved.' })
   async search(
     @Query('query') query?: string,
     @Query('category') category?: string,
@@ -48,6 +63,8 @@ export class ProductsController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get product by id' })
+  @ApiResponse({ status: 200, description: 'Product retrieved.' })
   async findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);
   }
@@ -55,6 +72,9 @@ export class ProductsController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.BRAND_PARTNER)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a product (admin/brand-partner)' })
+  @ApiResponse({ status: 201, description: 'Product created.' })
   async create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
@@ -62,6 +82,9 @@ export class ProductsController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.BRAND_PARTNER)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a product (admin/brand-partner)' })
+  @ApiResponse({ status: 200, description: 'Product updated.' })
   async update(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
@@ -72,6 +95,9 @@ export class ProductsController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete a product (admin)' })
+  @ApiResponse({ status: 200, description: 'Product removed.' })
   async remove(@Param('id') id: string) {
     await this.productsService.remove(id);
     return { message: 'Product removed' };
