@@ -11,6 +11,7 @@ import { CreateOrderDto } from './dto/create-orders.dto';
 import { Product, ProductDocument } from '../products/schemas/products.schema';
 import { CurrentUserData } from '../../common/decorators/current-user.decorator';
 import { UpdateOrderStatusDto, RequestRefundDto } from './dto/update-orders.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 export interface OrderResponse {
   id: string;
@@ -31,6 +32,7 @@ export class OrdersService {
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     @InjectConnection() private connection: Connection,
+    private notificationsService: NotificationsService,
   ) {}
 
   async createOrder(
@@ -161,6 +163,8 @@ export class OrdersService {
     order.refundReason = dto.refundReason;
     await order.save();
 
+    await this.notificationsService.logRefundRequested(order);
+
     return this.toResponse(order);
   }
 
@@ -174,6 +178,8 @@ export class OrdersService {
     if (!order) {
       throw new NotFoundException('Order not found');
     }
+
+    await this.notificationsService.logOrderStatusChange(order, dto.status);
 
     return this.toResponse(order);
   }

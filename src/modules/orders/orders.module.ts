@@ -4,6 +4,7 @@ import { Order, OrderSchema } from './schemas/orders.schema';
 import { Product, ProductSchema } from '../products/schemas/products.schema';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { OrdersService } from './orders.service';
       { name: Order.name, schema: OrderSchema },
       { name: Product.name, schema: ProductSchema },
     ]),
+    NotificationsModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],
