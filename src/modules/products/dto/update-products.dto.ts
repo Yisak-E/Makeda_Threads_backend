@@ -1,45 +1,4 @@
-import {
-  IsString,
-  IsNumber,
-  IsEnum,
-  IsOptional,
-  Min,
-  Max,
-  MinLength,
-} from 'class-validator';
-import { ProductCategory } from '../schemas/products.schema';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateProductDto } from './create-products.dto';
 
-export class UpdateProductDto {
-  @IsString()
-  @MinLength(2)
-  @IsOptional()
-  name?: string;
-
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  price?: number;
-
-  @IsString()
-  @IsOptional()
-  image?: string;
-
-  @IsEnum(ProductCategory)
-  @IsOptional()
-  category?: ProductCategory;
-
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  stockQuantity?: number;
-
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  @IsOptional()
-  discountPercentage?: number;
-
-  @IsString()
-  @IsOptional()
-  description?: string;
-}
+export class UpdateProductDto extends PartialType(CreateProductDto) {}

@@ -33,6 +33,12 @@ export class Product {
   @Prop()
   description?: string;
 
+  @Prop({ type: [String], default: [] })
+  sizes: string[];
+
+  @Prop({ type: [String], default: [] })
+  colors: string[];
+
   @Prop({ default: true })
   isActive: boolean;
 }

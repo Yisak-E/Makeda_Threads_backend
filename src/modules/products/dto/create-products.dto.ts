@@ -6,7 +6,7 @@ import {
   Min,
   Max,
   MinLength,
-  IsUrl,
+  IsArray,
 } from 'class-validator';
 import { ProductCategory } from '../schemas/products.schema';
 
@@ -38,4 +38,14 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  sizes?: string[];
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  colors?: string[];
 }
