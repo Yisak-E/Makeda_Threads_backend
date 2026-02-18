@@ -200,7 +200,7 @@ export class SeedService {
 
     const orders = [
       {
-        orderNumber: `ORD-${Date.now()}-001`,
+        orderNumber: this.generateSeedOrderNumber(),
         userId: users[0]._id,
         customerName: users[0].name,
         customerEmail: users[0].email,
@@ -210,13 +210,13 @@ export class SeedService {
         items: [
           {
             productId: products[0]._id,
-            productName: products[0].name,
+            name: products[0].name,
             quantity: 1,
             price: products[0].price,
           },
           {
             productId: products[1]._id,
-            productName: products[1].name,
+            name: products[1].name,
             quantity: 1,
             price: products[1].price,
           },
@@ -228,7 +228,7 @@ export class SeedService {
         country: users[0].country,
       },
       {
-        orderNumber: `ORD-${Date.now()}-002`,
+        orderNumber: this.generateSeedOrderNumber(),
         userId: users[1]._id,
         customerName: users[1].name,
         customerEmail: users[1].email,
@@ -238,7 +238,7 @@ export class SeedService {
         items: [
           {
             productId: products[2]._id,
-            productName: products[2].name,
+            name: products[2].name,
             quantity: 1,
             price: products[2].price,
           },
@@ -250,7 +250,7 @@ export class SeedService {
         country: users[1].country,
       },
       {
-        orderNumber: `ORD-${Date.now()}-003`,
+        orderNumber: this.generateSeedOrderNumber(),
         userId: users[2]._id,
         customerName: users[2].name,
         customerEmail: users[2].email,
@@ -260,7 +260,7 @@ export class SeedService {
         items: [
           {
             productId: products[3]._id,
-            productName: products[3].name,
+            name: products[3].name,
             quantity: 1,
             price: products[3].price,
           },
@@ -288,5 +288,12 @@ export class SeedService {
   async reseed() {
     await this.clearDatabase();
     await this.seedAll();
+  }
+
+  private generateSeedOrderNumber(): string {
+    const year = new Date().getFullYear().toString().slice(-2);
+    const chunk1 = Math.random().toString(36).slice(2, 6).toUpperCase();
+    const chunk2 = Math.random().toString(36).slice(2, 4).toUpperCase();
+    return `SS${year}${chunk1}${chunk2}`;
   }
 }

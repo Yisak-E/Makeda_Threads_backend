@@ -22,7 +22,7 @@ export class OrderItem {
   productId: Types.ObjectId;
 
   @Prop({ required: true })
-  productName: string;
+  name: string;
 
   @Prop({ required: true })
   quantity: number;
@@ -55,6 +55,9 @@ export class Order {
 
   @Prop({ type: String, enum: RefundStatus, default: RefundStatus.NONE })
   refundStatus: RefundStatus;
+
+  @Prop()
+  refundReason?: string;
 
   @Prop({ type: [OrderItemSchema], default: [] })
   items: OrderItem[];
