@@ -31,7 +31,7 @@ import { DatabaseModule } from './database/database.module';
       inject: [ConfigService],
     }),
 
-    // Feature Modules
+    // Modules
     UsersModule,
     ProductsModule,
     OrdersModule,
