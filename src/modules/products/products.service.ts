@@ -86,7 +86,7 @@ export class ProductsService {
         ...(updateProductDto.sizes ? { sizes: updateProductDto.sizes } : {}),
         ...(updateProductDto.colors ? { colors: updateProductDto.colors } : {}),
       },
-      { new: true },
+      { returnDocument: 'after' },
     );
 
     if (!updated) {

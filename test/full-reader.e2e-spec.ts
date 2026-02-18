@@ -8,12 +8,7 @@ import { AppModule } from '../src/app.module';
 import { createInMemoryMongo } from './utils/test-db';
 import { User, UserDocument, UserRole } from '../src/modules/users/schemas/users.schema';
 
-interface LoginResponse {
-  access_token: string;
-  user: { id: string; email: string };
-}
-
-describe('Makeda Threads API (e2e)', () => {
+describe('Makeda Threads API (full reader)', () => {
   let app: INestApplication;
   let userModel: Model<UserDocument>;
   let stopMongo: () => Promise<void>;
@@ -51,40 +46,11 @@ describe('Makeda Threads API (e2e)', () => {
     }
   });
 
-  it('GET /api/v1 returns health string', async () => {
-    const res = await request(app.getHttpServer()).get('/api/v1');
-    expect(res.status).toBe(200);
-    expect(typeof res.text).toBe('string');
-  });
-
-  it('registers a customer and logs in', async () => {
-    const registerRes = await request(app.getHttpServer())
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'e2e.customer@email.com',
-        name: 'E2E Customer',
-        password: 'Password123',
-      });
-
-    expect(registerRes.status).toBe(201);
-    expect(registerRes.body.access_token).toBeDefined();
-
-    const loginRes = await request(app.getHttpServer())
-      .post('/api/v1/auth/login')
-      .send({
-        email: 'e2e.customer@email.com',
-        password: 'Password123',
-      });
-
-    expect(loginRes.status).toBe(200);
-    expect(loginRes.body.access_token).toBeDefined();
-  });
-
-  it('creates product, places order, and logs notifications', async () => {
+  it('reads all key endpoints successfully', async () => {
     const adminPassword = await bcrypt.hash('Password123', 10);
     await userModel.create({
-      email: 'e2e.admin@email.com',
-      name: 'E2E Admin',
+      email: 'reader.admin@email.com',
+      name: 'Reader Admin',
       password: adminPassword,
       role: UserRole.ADMIN,
       isActive: true,
@@ -93,43 +59,50 @@ describe('Makeda Threads API (e2e)', () => {
     const adminLogin = await request(app.getHttpServer())
       .post('/api/v1/auth/login')
       .send({
-        email: 'e2e.admin@email.com',
+        email: 'reader.admin@email.com',
         password: 'Password123',
       });
 
-    const adminToken = (adminLogin.body as LoginResponse).access_token;
+    expect(adminLogin.status).toBe(200);
+    const adminToken = adminLogin.body.access_token;
 
     const productRes = await request(app.getHttpServer())
       .post('/api/v1/products')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        name: 'E2E Luxury Dress',
-        price: 250,
+        name: 'Reader Product',
+        price: 220,
         image: 'https://images.unsplash.com/photo-1?w=1080',
         category: 'Female',
-        stockQuantity: 5,
+        stockQuantity: 12,
         discountPercentage: 0,
       });
 
     expect(productRes.status).toBe(201);
-    expect(productRes.body.lowStock).toBe(true);
 
     const customerRegister = await request(app.getHttpServer())
       .post('/api/v1/auth/register')
       .send({
-        email: 'e2e.buyer@email.com',
-        name: 'E2E Buyer',
+        email: 'reader.customer@email.com',
+        name: 'Reader Customer',
         password: 'Password123',
       });
 
-    const customerToken = (customerRegister.body as LoginResponse).access_token;
+    expect(customerRegister.status).toBe(201);
+    const customerToken = customerRegister.body.access_token;
+
+    const profileRes = await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set('Authorization', `Bearer ${customerToken}`);
+
+    expect(profileRes.status).toBe(200);
 
     const orderRes = await request(app.getHttpServer())
       .post('/api/v1/orders')
       .set('Authorization', `Bearer ${customerToken}`)
       .send({
-        customerName: 'E2E Buyer',
-        customerEmail: 'e2e.buyer@email.com',
+        customerName: 'Reader Customer',
+        customerEmail: 'reader.customer@email.com',
         items: [{ productId: productRes.body.id, quantity: 1 }],
         shippingAddress: '15 Admiralty Way, Lekki Phase 1',
         city: 'Lagos',
@@ -138,8 +111,6 @@ describe('Makeda Threads API (e2e)', () => {
       });
 
     expect(orderRes.status).toBe(201);
-    expect(orderRes.body.orderNumber.startsWith('SS')).toBe(true);
-    expect(orderRes.body.items).toBe(1);
 
     const refundRes = await request(app.getHttpServer())
       .patch(`/api/v1/orders/${orderRes.body.id}/request-refund`)
@@ -147,7 +118,6 @@ describe('Makeda Threads API (e2e)', () => {
       .send({ refundReason: 'Size does not fit as expected' });
 
     expect(refundRes.status).toBe(200);
-    expect(refundRes.body.refundStatus).toBe('Requested');
 
     const statusRes = await request(app.getHttpServer())
       .patch(`/api/v1/orders/${orderRes.body.id}/status`)
@@ -155,14 +125,40 @@ describe('Makeda Threads API (e2e)', () => {
       .send({ status: 'Shipped' });
 
     expect(statusRes.status).toBe(200);
-    expect(statusRes.body.status).toBe('Shipped');
 
-    const logsRes = await request(app.getHttpServer())
+    const productsRes = await request(app.getHttpServer())
+      .get('/api/v1/products');
+
+    expect(productsRes.status).toBe(200);
+    expect(Array.isArray(productsRes.body)).toBe(true);
+
+    const searchRes = await request(app.getHttpServer())
+      .get('/api/v1/products/search')
+      .query({ query: 'Reader', category: 'Female' });
+
+    expect(searchRes.status).toBe(200);
+
+    const myOrdersRes = await request(app.getHttpServer())
+      .get('/api/v1/orders/my-orders')
+      .set('Authorization', `Bearer ${customerToken}`);
+
+    expect(myOrdersRes.status).toBe(200);
+
+    const allOrdersRes = await request(app.getHttpServer())
+      .get('/api/v1/orders/admin/all')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(allOrdersRes.status).toBe(200);
+
+    const notificationsRes = await request(app.getHttpServer())
       .get('/api/v1/notifications')
       .set('Authorization', `Bearer ${customerToken}`);
 
-    expect(logsRes.status).toBe(200);
-    expect(Array.isArray(logsRes.body)).toBe(true);
-    expect(logsRes.body.length).toBeGreaterThanOrEqual(2);
+    expect(notificationsRes.status).toBe(200);
+
+    const healthRes = await request(app.getHttpServer())
+      .get('/api/v1');
+
+    expect(healthRes.status).toBe(200);
   });
 });

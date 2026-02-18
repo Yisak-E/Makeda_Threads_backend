@@ -129,6 +129,68 @@ Authorization: Bearer YOUR_ADMIN_OR_PARTNER_TOKEN
 
 ---
 
+## 🧾 Orders & Notifications Examples
+
+### Create Order (Checkout)
+
+```http
+POST /orders
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+
+{
+  "customerName": "Amara Okafor",
+  "customerEmail": "amara.okafor@email.com",
+  "items": [
+    { "productId": "66f1d2e7d12a1c1234567890", "quantity": 2 }
+  ],
+  "shippingAddress": "15 Admiralty Way, Lekki Phase 1",
+  "city": "Lagos",
+  "postalCode": "101245",
+  "country": "Nigeria"
+}
+```
+
+### Request Refund
+
+```http
+PATCH /orders/{id}/request-refund
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+
+{
+  "refundReason": "Size does not fit as expected"
+}
+```
+
+### Update Order Status (Admin)
+
+```http
+PATCH /orders/{id}/status
+Authorization: Bearer YOUR_ADMIN_TOKEN
+Content-Type: application/json
+
+{
+  "status": "Shipped"
+}
+```
+
+### Get Notifications
+
+```http
+GET /notifications
+Authorization: Bearer YOUR_TOKEN
+```
+
+### Get Notifications for Recipient (Admin or Owner)
+
+```http
+GET /notifications?recipient=amara.okafor@email.com
+Authorization: Bearer YOUR_TOKEN
+```
+
+---
+
 ## 🔑 Test Credentials
 
 All users have password: `Password123`

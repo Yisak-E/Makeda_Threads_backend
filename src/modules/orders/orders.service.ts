@@ -114,6 +114,8 @@ export class OrdersService {
         throw new BadRequestException('Order creation failed');
       }
 
+      await this.notificationsService.logOrderCreated(createdOrder);
+
       return this.toResponse(createdOrder);
     } finally {
       await session.endSession();
@@ -172,7 +174,7 @@ export class OrdersService {
     const order = await this.orderModel.findByIdAndUpdate(
       id,
       { status: dto.status },
-      { new: true },
+      { returnDocument: 'after' },
     );
 
     if (!order) {

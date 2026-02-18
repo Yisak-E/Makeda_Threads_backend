@@ -7,7 +7,7 @@ import {
   NotificationLogStatus,
   NotificationLogType,
 } from './schemas/notification-log.schema';
-import { OrderDocument, OrderStatus, RefundStatus } from '../orders/schemas/orders.schema';
+import { OrderDocument, OrderStatus } from '../orders/schemas/orders.schema';
 import { CurrentUserData } from '../../common/decorators/current-user.decorator';
 import { User, UserDocument, UserRole } from '../users/schemas/users.schema';
 
@@ -21,6 +21,16 @@ export class NotificationsService {
 
   async logOrderStatusChange(order: OrderDocument, status: OrderStatus) {
     const subject = `Order Status Update - ${order.orderNumber} (${status})`;
+    await this.createLog({
+      recipient: order.customerEmail,
+      subject,
+      orderNumber: order.orderNumber,
+      status: NotificationLogStatus.SENT,
+    });
+  }
+
+  async logOrderCreated(order: OrderDocument) {
+    const subject = `Order Confirmation - ${order.orderNumber}`;
     await this.createLog({
       recipient: order.customerEmail,
       subject,

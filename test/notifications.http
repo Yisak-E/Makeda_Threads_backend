@@ -1,0 +1,13 @@
+### Notifications API Tests
+### Base URL: http://localhost:3000/api/v1
+
+@baseUrl = http://localhost:3000/api/v1
+@token = YOUR_TOKEN
+
+### Get Notifications (current user)
+GET {{baseUrl}}/notifications
+Authorization: Bearer {{token}}
+
+### Get Notifications for a recipient (admin or owner)
+GET {{baseUrl}}/notifications?recipient=amara.okafor@email.com
+Authorization: Bearer {{token}}

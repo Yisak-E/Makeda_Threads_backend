@@ -1,0 +1,50 @@
+### Orders API Tests
+### Base URL: http://localhost:3000/api/v1
+
+@baseUrl = http://localhost:3000/api/v1
+@token = YOUR_TOKEN
+@adminToken = YOUR_ADMIN_TOKEN
+@orderId = YOUR_ORDER_ID
+
+### Create Order
+POST {{baseUrl}}/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "customerName": "Amara Okafor",
+  "customerEmail": "amara.okafor@email.com",
+  "items": [
+    { "productId": "YOUR_PRODUCT_ID", "quantity": 1 }
+  ],
+  "shippingAddress": "15 Admiralty Way, Lekki Phase 1",
+  "city": "Lagos",
+  "postalCode": "101245",
+  "country": "Nigeria"
+}
+
+### My Orders
+GET {{baseUrl}}/orders/my-orders
+Authorization: Bearer {{token}}
+
+### Request Refund
+PATCH {{baseUrl}}/orders/{{orderId}}/request-refund
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "refundReason": "Size does not fit as expected"
+}
+
+### Update Order Status (Admin)
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "status": "Shipped"
+}
+
+### Admin - Get All Orders
+GET {{baseUrl}}/orders/admin/all
+Authorization: Bearer {{adminToken}}
