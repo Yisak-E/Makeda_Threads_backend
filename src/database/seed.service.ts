@@ -2,7 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument, UserRole } from '../modules/users/schemas/users.schema';
-import { Product, ProductDocument, ProductCategory } from '../modules/products/schemas/products.schema';
+import { Product, ProductDocument } from '../modules/products/schemas/products.schema';
+import { EXTENDED_PRODUCTS_SEED } from './seed-data/extended-products';
 import { Order, OrderDocument, OrderStatus, RefundStatus } from '../modules/orders/schemas/orders.schema';
 import * as bcrypt from 'bcrypt';
 
@@ -35,98 +36,11 @@ export class SeedService {
       return;
     }
 
-    const products = [
-      {
-        name: 'Ethiopian Traditional Dress - Habesha Kemis',
-        price: 129.99,
-        image: '/products/habesha-kemis-1.jpg',
-        category: ProductCategory.FEMALE,
-        stockQuantity: 25,
-        discountPercentage: 15,
-        description: 'Elegant traditional Ethiopian dress with intricate embroidery',
-      },
-      {
-        name: 'Premium Habesha Kemis - White Gold',
-        price: 199.99,
-        image: '/products/habesha-kemis-2.jpg',
-        category: ProductCategory.FEMALE,
-        stockQuantity: 15,
-        discountPercentage: 0,
-        description: 'Premium white Habesha dress with gold accents',
-      },
-      {
-        name: 'Men\'s Ethiopian Shirt - Kitfo Design',
-        price: 79.99,
-        image: '/products/mens-shirt-1.jpg',
-        category: ProductCategory.MALE,
-        stockQuantity: 40,
-        discountPercentage: 0,
-        description: 'Traditional Ethiopian men\'s shirt with modern fit',
-      },
-      {
-        name: 'Men\'s Formal Ethiopian Suit',
-        price: 199.99,
-        image: '/products/mens-suit-1.jpg',
-        category: ProductCategory.MALE,
-        stockQuantity: 15,
-        discountPercentage: 5,
-        description: 'Premium traditional Ethiopian formal suit',
-      },
-      {
-        name: 'Kids Traditional Outfit',
-        price: 49.99,
-        image: '/products/kids-outfit-1.jpg',
-        category: ProductCategory.KIDS,
-        stockQuantity: 30,
-        discountPercentage: 20,
-        description: 'Adorable traditional outfit for children',
-      },
-      {
-        name: 'Kids Habesha Dress Set',
-        price: 59.99,
-        image: '/products/kids-outfit-2.jpg',
-        category: ProductCategory.KIDS,
-        stockQuantity: 25,
-        discountPercentage: 15,
-        description: 'Complete traditional dress set for kids',
-      },
-      {
-        name: 'Ethiopian Cotton Shawl - Netela',
-        price: 39.99,
-        image: '/products/netela-1.jpg',
-        category: ProductCategory.GENERAL,
-        stockQuantity: 50,
-        discountPercentage: 10,
-        description: 'Handwoven Ethiopian cotton shawl',
-      },
-      {
-        name: 'Premium Netela - Handwoven',
-        price: 69.99,
-        image: '/products/netela-2.jpg',
-        category: ProductCategory.GENERAL,
-        stockQuantity: 30,
-        discountPercentage: 0,
-        description: 'Premium handwoven Ethiopian shawl',
-      },
-      {
-        name: 'Wedding Habesha Dress',
-        price: 299.99,
-        image: '/products/wedding-dress-1.jpg',
-        category: ProductCategory.FEMALE,
-        stockQuantity: 10,
-        discountPercentage: 0,
-        description: 'Luxurious wedding dress with gold embroidery',
-      },
-      {
-        name: 'Traditional Ethiopian Scarf',
-        price: 29.99,
-        image: '/products/scarf-1.jpg',
-        category: ProductCategory.GENERAL,
-        stockQuantity: 60,
-        discountPercentage: 25,
-        description: 'Colorful traditional Ethiopian scarf',
-      },
-    ];
+    const products = EXTENDED_PRODUCTS_SEED.map((product) => ({
+      ...product,
+      sizes: product.sizes ?? [],
+      colors: product.colors ?? [],
+    }));
 
     await this.productModel.insertMany(products);
     this.logger.log(`Seeded ${products.length} products`);

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import {
   Product,
   ProductCategory,
@@ -27,7 +27,7 @@ export class ProductsService {
   ) {}
 
   async findAll(category?: ProductCategory): Promise<ProductResponse[]> {
-    const filter: FilterQuery<ProductDocument> = { isActive: true };
+    const filter: Record<string, unknown> = { isActive: true };
     if (category) {
       filter.category = category;
     }
@@ -40,7 +40,7 @@ export class ProductsService {
     query?: string,
     category?: ProductCategory,
   ): Promise<ProductResponse[]> {
-    const filter: FilterQuery<ProductDocument> = { isActive: true };
+    const filter: Record<string, unknown> = { isActive: true };
 
     if (query) {
       filter.name = { $regex: query, $options: 'i' };
